@@ -1,15 +1,17 @@
 "use client";
 
 import ArrowRight from "@/assets/arrow-right.svg";
-import Logo from "@/assets/Nilcloud.png";
-import Image from "next/image";
 import MenuIcon from "@/assets/menu.svg";
-import { useState } from "react";
+import Logo from "@/assets/Nilcloud.png";
 import { authService } from "@/services/authService"; // 👈 Import du service auth
+import Image from "next/image";
+import { useRouter } from "next/navigation"; // Ajouter cette importation
+import { useState } from "react";
 
 export const Header = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter(); // Ajouter cette ligne
 
   const handleLogin = async () => {
     try {
@@ -26,6 +28,10 @@ export const Header = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGetStarted = () => {
+    router.push("/dashboard");
   };
 
   return (
@@ -49,11 +55,11 @@ export const Header = () => {
               <a href="#">Services</a>
               <a href="#">Contact</a>
               <button
-                onClick={handleLogin}
+                onClick={handleGetStarted}
                 className="bg-black text-white px-4 py-2 rounded-lg font-medium inline-flex align-items justify-center tracking-tight"
                 disabled={loading}
               >
-                {loading ? "Connexion..." : "Get started"}
+                {loading ? "Redirection..." : "Get started"}
               </button>
             </nav>
           </div>
