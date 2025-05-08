@@ -5,16 +5,22 @@ import cogImage from "@/assets/cog.png";
 import cylinderImage from "@/assets/cylinder.png";
 import noodleImage from "@/assets/noodle.png";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
 
 export const Hero = () => {
   const heroRef = useRef(null);
+  const router = useRouter();
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start end", "end start"],
   });
 
   const translateY = useTransform(scrollYProgress, [0, 1], [150, -150]);
+
+  const handleGetStarted = () => {
+    router.push("/dashboard");
+  };
 
   return (
     <section
@@ -35,7 +41,9 @@ export const Hero = () => {
               Next-gen Deployment Solution
             </p>
             <div className="flex gap-1 items-center justify-center md:justify-start mt-[30px]">
-              <button className="btn btn-primary">Get started</button>
+              <button className="btn btn-primary" onClick={handleGetStarted}>
+                Get started
+              </button>
               <button className="btn btn-text gap-1">
                 <span>Learn more</span>
                 <ArrowIcon className="w-5 h-5" />
