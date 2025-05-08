@@ -35,7 +35,11 @@ export const ProductShowcase = () => {
           </p>
         </div>
         <div className="relative">
-          <Image src={productImage} alt="Product Image" className="mt-10" />
+          <Image
+            src={productImage}
+            alt="Product Image"
+            className="mt-10 rounded-xl mx-auto max-w-[80%] md:max-w-[70%]"
+          />
           <motion.img
             src={pyramidImage.src}
             alt="Pyramid Image"
