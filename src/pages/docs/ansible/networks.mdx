@@ -1,0 +1,83 @@
+# Networks
+
+Cette section explique la configuration réseau utilisée dans les déploiements Ansible avec Docker.
+
+---
+
+## Configuration du réseau
+
+Un réseau Docker spécifique est utilisé pour faciliter la communication entre les conteneurs :
+
+```bash
+# Création du réseau Docker
+docker network create --subnet=172.20.0.0/24 --gateway 172.20.0.1 --driver bridge net-ansible
+
+# Vérification de la configuration du réseau
+docker network inspect net-ansible
+```
+
+### Exemple de sortie de `docker network inspect`
+
+```json
+[
+  {
+    "Name": "net-ansible",
+    "Id": "1d64002b6c6d969b443d3845ce2574dfad603c7ad767807b13db8a793630c475",
+    "Created": "2023-10-07T10:12:19.800384336Z",
+    "Scope": "local",
+    "Driver": "bridge",
+    "EnableIPv6": false,
+    "IPAM": {
+      "Driver": "default",
+      "Options": {},
+      "Config": [
+        {
+          "Subnet": "172.20.0.0/16",
+          "Gateway": "172.20.0.1"
+        }
+      ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "ConfigFrom": {
+      "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {
+      "ad63fd90d4b20c382068c1b5ad5f7f9f763d9399df729b3893267327576b36f3": {
+        "Name": "master",
+        "EndpointID": "93d114f8e51f3f2bdd17336a4440e0294f62b6e95206933b4bd3ee2494a5566c",
+        "MacAddress": "02:42:ac:14:00:03",
+        "IPv4Address": "172.20.0.3/16",
+        "IPv6Address": ""
+      },
+      "cd1fc7ca781d1b79cd03a07f07be89a77c81f8d99c5c2236048713f3ffd8810e": {
+        "Name": "repo",
+        "EndpointID": "b83168a181dfa96531aceb252b27d58f4478f6e31fd56f5c84450c7984a32be5",
+        "MacAddress": "02:42:ac:14:00:02",
+        "IPv4Address": "172.20.0.2/16",
+        "IPv6Address": ""
+      }
+    },
+    "Options": {},
+    "Labels": {}
+  }
+]
+```
+
+---
+
+## Objectif du réseau
+
+- Faciliter la communication entre les conteneurs Ansible Master et Slave.
+- Garantir une connectivité stable pour les exécutions de playbooks et la gestion des rôles.
+
+### Conteneurs connectés
+
+1. **Master** : Conteneur principal pour l'exécution des commandes Ansible.
+2. **Repo** : Conteneur slave hébergeant les rôles et fichiers requis.
+
+---
+
+Pour plus d'informations sur la gestion des réseaux Docker, reportez-vous à la [documentation officielle Docker](https://docs.docker.com/network/).

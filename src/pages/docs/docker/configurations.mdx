@@ -1,0 +1,149 @@
+# Configuration des Images Docker
+
+### Image : `tomcat`
+
+**Version :** 1.2.0
+
+**Configuration :** No configuration setup
+
+**Utilisation :**
+
+- **SSL ON**
+
+```bash
+docker build --rm -t san_tomcat -f Dockerfile --build-arg PBK_TO_BUILD=tomcat --build-arg ENTRYPOINT="catalina.sh run" .
+
+docker run -d san_tomcat
+```
+
+- **SSL OFF**
+
+```bash
+docker build --rm -t san_tomcat -f Dockerfile --build-arg PBK_TO_BUILD=tomcat --build-arg ENTRYPOINT="catalina.sh run" .
+
+docker run -d san_tomcat
+```
+
+---
+
+### Image : `httpd`
+
+**Version :** 1.2.0
+
+**Configuration :**
+
+- minimal
+- minimal_ssl
+- php
+- php_ssl
+- basic
+- windows
+
+**Utilisation :**
+
+- **SSL ON**
+
+```bash
+docker build --rm -t san_httpd -f Dockerfile --build-arg PBK_TO_BUILD=httpd --build-arg ENTRYPOINT="httpd-foreground" --build-arg SSL=on --build-arg PATH_TO_SSL="/usr/local/apache2" --build-arg CRT_FILE_NAME="server.crt" --build-arg KEY_FILE_NAME="server.key" --build-arg CONF=minimal_ssl .
+
+docker run -d san_httpd
+```
+
+- **SSL OFF**
+
+```bash
+docker build --rm -t san_httpd -f Dockerfile --build-arg PBK_TO_BUILD=httpd --build-arg ENTRYPOINT="httpd-foreground" --build-arg SSL=off --build-arg CONF=minimal .
+
+docker run -d san_httpd
+```
+
+---
+
+### Image : `nginx`
+
+**Version :** 1.5.0
+
+**Configuration :**
+
+- minimal_ssl_dev
+
+**Utilisation :**
+
+- **PRE-BUILD TEST**
+
+```bash
+docker build --rm -t san_nginx:minimal_ssl_dev -f Dockerfile.build_dev --build-arg PBK_TO_BUILD=nginx --build-arg CONF="minimal_ssl_dev" --build-arg ENTRYPOINT="nginx -c /etc/nginx/nginx.conf" --build-arg SSL="on" --build-arg PATH_TO_SSL="/etc/nginx/ssl" --build-arg CRT_FILE_NAME="server.crt" --build-arg KEY_FILE_NAME="server.key" --build-arg USER="root" --build-arg APP_NAME="tst-nginx-app" --build-arg SSH_PUB_FILE_NAME="slave.pub" --build-arg SSH_PRIV_FILE_NAME="slave" --build-arg SSH_USER_PUB_FILE_NAME="id_rsa.pub" --build-arg CONF_SSH="rootfull" .
+
+docker run -it -p 8443:443 --network ansible-net --hostname nginx san_nginx:minimal_ssl_dev
+```
+
+- **FINAL TEST**
+
+```bash
+docker run -it -p 8443:443 --network ansible-net --hostname nginx registry.gitlab.com/olympe_cloud/uai-hephaistos/san-nginx:minimal_ssl_dev
+
+docker run -it -v $PWD/ansible:/ansible --hostname master --network ansible-net wizend/ansible-master
+```
+
+---
+
+### Image : `mariadb`
+
+**Version :** 1.2.0
+
+**Configuration :**
+
+- minimal
+- minimal_ssl
+- galera
+- docapost
+
+**Utilisation :**
+
+- **SSL ON**
+
+```bash
+docker build --rm -t san_mariadb -f Dockerfile --build-arg PBK_TO_BUILD=mariadb --build-arg ENTRYPOINT="mariadb-install-db --user=mysql --ldata=/var/lib/mysql\nmariadbd" --build-arg SSL=on --build-arg PATH_TO_SSL="/etc/mysql/ssl" --build-arg CRT_FILE_NAME="server.crt" --build-arg KEY_FILE_NAME="server.key" --build-arg CONF=minimal_ssl .
+
+docker run -d --env MARIADB_ROOT_PASSWORD=oklm san_mariadb
+```
+
+- **SSL OFF**
+
+```bash
+docker build --rm -t san_mariadb -f Dockerfile --build-arg PBK_TO_BUILD=mariadb --build-arg ENTRYPOINT="mariadb-install-db --user=mysql --ldata=/var/lib/mysql\nmariadbd" --build-arg SSL=off --build-arg CONF=minimal .
+
+docker run -d --env MARIADB_ROOT_PASSWORD=oklm san_mariadb
+```
+
+- **GALERA ON** _(non fonctionnel)_
+
+```bash
+docker build --rm -t san_mariadb -f Dockerfile --build-arg PBK_TO_BUILD=mariadb --build-arg ENTRYPOINT="mariadb-install-db --user=mysql --ldata=/var/lib/mysql\nmariadbd" --build-arg SSL=off --build-arg CONF=galera .
+
+node1 : docker run -d --name node1 -h node1 san_mariadb
+node2 : docker run -d --name node2 -h node2 san_mariadb
+node3 : docker run -d --name node3 -h node3 san_mariadb
+```
+
+---
+
+## Améliorations Envisagées
+
+### Tomcat
+
+- Config recette, preprod, prod, alpine (light).
+
+### HTTPD
+
+- Config recette, preprod, prod, alpine (light).
+
+### Mariadb
+
+- Config recette, preprod, prod, galera, non root user, alpine (light).
+
+### Nginx
+
+- Config recette, preprod, prod, amplify, logrotate, alpine (light).
+
+Pour plus d'informations, consultez la [documentation officielle Docker](https://docs.docker.com).

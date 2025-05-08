@@ -1,0 +1,81 @@
+# Playbooks
+
+Les playbooks sont au cœur de l'automatisation avec Ansible. Cette section explique comment les playbooks sont structurés et utilisés dans nos conteneurs Docker pour NilCloud.
+
+---
+
+## Exemple de Playbook Général
+
+Voici un exemple de playbook général utilisé pour tester et exécuter des rôles Ansible dans nos conteneurs :
+
+```yaml
+---
+- name: "Test Roles"
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - role: "{{ pbk_to_build }}"
+```
+
+### Description :
+
+- **hosts** : Définit les hôtes cibles (`localhost` dans ce cas).
+- **gather_facts** : Définit si Ansible doit collecter les faits sur l’hôte avant l'exécution.
+- **roles** : Indique le rôle Ansible à exécuter, basé sur la variable `pbk_to_build`.
+
+---
+
+## Structure des Playbooks
+
+### Fichier `main.yml`
+
+Le fichier `main.yml` est utilisé comme point d'entrée principal pour le lancement des rôles. Il est copié dans chaque conteneur et appelé lors du déploiement ou des tests.
+
+Exemple de `main.yml` :
+
+```yaml
+---
+- name: "Lancer le rôle principal"
+  hosts: all
+  gather_facts: yes
+  roles:
+    - role: "./{{ lookup('ansible.builtin.env', 'PBK_TO_BUILD') }}"
+```
+
+### Points importants :
+
+- **lookup** : Utilisé pour récupérer une variable d'environnement spécifiant le rôle à exécuter.
+- **roles** : Chemin dynamique vers le rôle basé sur la variable `PBK_TO_BUILD`.
+
+---
+
+## Exécution des Playbooks dans les Conteneurs
+
+Les playbooks sont exécutés automatiquement à l'intérieur des conteneurs, mais voici un exemple de commande pour les lancer manuellement :
+
+```bash
+ansible-playbook -i inventories/hosts playbooks/main.yml -e pbk_to_build=<role_name> -vv
+```
+
+### Arguments :
+
+- **`-i inventories/hosts`** : Spécifie le fichier d’inventaire pour les hôtes cibles.
+- **`-e pbk_to_build=<role_name>`** : Passe la variable `pbk_to_build` au playbook.
+- **`-vv`** : Active un niveau de verbosité élevé pour le débogage.
+
+---
+
+## Inventaires
+
+Les inventaires définissent les hôtes cibles pour Ansible. Voici un exemple typique :
+
+```ini
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_private_key_file=/root/.ssh/master
+
+[slaves]
+repo    ansible_host=172.20.0.2
+```

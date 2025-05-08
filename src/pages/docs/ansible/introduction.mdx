@@ -1,0 +1,60 @@
+# Introduction
+
+Ce document détaille les configurations, images Docker, et scripts Ansible utilisés dans le projet Nilcloud.
+
+---
+
+## Aperçu des services
+
+- **Automation Industry** : Projets et services liés à l'industrie de l'automatisation, tels que `sai-rhea` et `dai-gaïa`.
+- **Images Docker** : Une collection d'images optimisées pour divers cas d'utilisation, incluant l'exécution de playbooks Ansible.
+
+---
+
+## Utilisation des playbooks
+
+Les playbooks Ansible facilitent la configuration et le déploiement des environnements :
+
+```yml
+---
+- name: "Test Roles"
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - role: "./{{ lookup('ansible.builtin.env', 'PBK_TO_BUILD') }}"
+```
+
+---
+
+## Déploiement rapide avec Docker
+
+Les images Docker listées dans ce projet sont conçues pour automatiser les tâches courantes :
+
+1. **wizend/ansible:latest** : Lancement direct de playbooks dans un conteneur.
+2. **autoprovisionning-container** : Gestion avancée des rôles et configurations Ansible.
+
+Exemple d'utilisation :
+
+```Dockerfile
+FROM debian:bookworm-slim
+USER root
+
+RUN apt-get update && apt-get install -y ansible && apt-get clean
+RUN mkdir /playbooks
+COPY main.yml /playbooks/main.yml
+RUN chmod +x /playbooks
+
+WORKDIR /playbooks
+ENTRYPOINT [ "/bin/bash" ]
+```
+
+---
+
+## Objectif
+
+Créer une documentation claire et complète pour les utilisateurs finaux et l'équipe DevOps, facilitant :
+
+- L'adoption rapide des outils.
+- Le dépannage efficace des systèmes.
+
+Pour plus de détails, consultez les sections spécifiques sur les réseaux et les rôles Ansible.

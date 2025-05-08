@@ -1,0 +1,39 @@
+# Introduction
+
+Bienvenue dans la documentation de **Docker Automatisation pour NilCloud**. Cette documentation vise à expliquer les bases des conteneurs utilisés, leurs configurations, et leur rôle dans le cadre de l’automatisation des déploiements et de la gestion des applications.
+
+---
+
+## Objectifs
+
+1. **Standardisation des Environnements** : Fournir des images conteneurisées prêtes à l’emploi pour des environnements standardisés.
+2. **Automatisation** : Réduction du travail manuel en utilisant des `Dockerfiles` pour provisionner et configurer les conteneurs.
+3. **Flexibilité** : Support pour différentes configurations, y compris des options comme SSL ou des variables d'environnement.
+
+---
+
+## Vue d'ensemble
+
+Les conteneurs définis dans ce projet sont optimisés pour :
+
+- **Ansible Automation** : Lancer et gérer des playbooks directement depuis des conteneurs.
+- **Provisionnement** : Créer des environnements spécifiques avec des variables dynamiques pour s’adapter aux besoins de l’utilisateur.
+- **Réseaux personnalisés** : Permettre des communications sécurisées et organisées entre différents services conteneurisés.
+
+---
+
+## Organisation des Conteneurs
+
+- **Conteneur de base Ansible** : Image contenant Ansible et ses dépendances, utilisée comme fondation pour les autres conteneurs.
+- **Autoprovisionning Containers** : Images conçues pour gérer automatiquement des rôles spécifiques, comme les serveurs Tomcat, Nginx ou HTTPD.
+- **Conteneurs Master/Slave** : Une architecture maître-esclave pour gérer les communications entre Ansible et les serveurs gérés.
+
+---
+
+## Pourquoi ce projet ?
+
+L'objectif principal est de simplifier et d'automatiser les processus de déploiement pour les environnements complexes en réduisant les interventions humaines et en favorisant des workflows reproductibles et scalables.
+
+Explorez les sections détaillées pour une compréhension approfondie des **images**, des **playbooks**, et des bonnes pratiques.
+
+---

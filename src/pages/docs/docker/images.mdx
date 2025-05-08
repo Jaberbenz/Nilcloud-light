@@ -1,0 +1,193 @@
+# Images Docker
+
+Voici les différentes images Docker utilisées pour les services de Nilcloud, avec leurs descriptions et instructions.
+
+---
+
+## `wizend/ansible:latest`
+
+### Description
+
+- Lancement direct d'un playbook dans un conteneur.
+- À utiliser directement dans un autre Docker avec `FROM wizend/ansible:latest`.
+
+```Dockerfile
+FROM debian:bookworm-slim
+USER root
+
+RUN apt-get update && apt-get install -y ansible && apt-get clean
+
+RUN mkdir /playbooks
+COPY main.yml /playbooks/main.yml
+RUN chmod +x /playbooks
+
+WORKDIR /playbooks
+
+ENTRYPOINT [ "/bin/bash" ]
+
+# docker rmi ansible | docker build -t ansible -f Dockerfile-ansible .
+# docker run -it ansible
+# docker tag ansible wizend/ansible:latest
+# docker push --all-tags wizend/ansible
+```
+
+---
+
+## `autoprovisionning-container`
+
+### Version `v0.1.0`
+
+- Lance `catalina.sh` manuellement.
+- Arguments pris en charge : `--build-arg`.
+
+```Dockerfile
+ARG PBK_TO_BUILD
+FROM $PBK_TO_BUILD:latest
+USER root
+
+RUN apt-get update && apt-get install -y python3-pip dos2unix && apt-get clean
+
+RUN pip install ansible
+RUN ansible-galaxy collection install community.general
+
+ARG PBK_TO_BUILD
+ENV PBK_TO_BUILD=$PBK_TO_BUILD
+
+RUN mkdir /ansible
+RUN mkdir /ansible/$PBK_TO_BUILD
+COPY ./ansible/container/$PBK_TO_BUILD /ansible/$PBK_TO_BUILD
+COPY ./ansible/main.yml /ansible/main.yml
+RUN chmod +x /ansible/$PBK_TO_BUILD
+
+WORKDIR /ansible
+RUN ansible-playbook main.yml
+
+RUN pip uninstall -y ansible
+RUN apt-get purge -y --auto-remove python3-pip && apt-get clean
+
+WORKDIR /
+RUN rm -rf /ansible
+
+COPY ./entrypoint.sh /entrypoint.sh
+RUN dos2unix /entrypoint.sh
+
+ENTRYPOINT catalina.sh run
+
+# docker rmi san_tomcat | docker build -t san_tomcat -f Dockerfile-san-tomcat --build-arg PBK_TO_BUILD=tomcat .
+# docker run -p 8087:8080 -it san_tomcat
+```
+
+---
+
+### Version `v0.1.1`
+
+- Prend en argument `--build-arg ENTRYPOINT`.
+- Copie le rôle Ansible et lance le playbook.
+
+```Dockerfile
+ARG PBK_TO_BUILD
+FROM $PBK_TO_BUILD:latest
+USER root
+
+RUN apt-get update && apt-get install -y python3-pip dos2unix cron && apt-get clean
+
+RUN pip install ansible
+RUN ansible-galaxy collection install community.general
+
+ARG PBK_TO_BUILD
+ENV PBK_TO_BUILD=$PBK_TO_BUILD
+
+RUN mkdir /ansible
+RUN mkdir /ansible/$PBK_TO_BUILD
+COPY ./ansible/container/$PBK_TO_BUILD /ansible/$PBK_TO_BUILD
+COPY ./ansible/main.yml /ansible/main.yml
+RUN chmod +x /ansible/$PBK_TO_BUILD
+
+WORKDIR /ansible
+RUN ansible-playbook main.yml
+
+RUN pip uninstall -y ansible
+RUN apt-get purge -y --auto-remove python3-pip && apt-get clean
+
+WORKDIR /
+RUN rm -rf /ansible
+
+ARG ENTRYPOINT
+RUN echo "#!/bin/bash\n$ENTRYPOINT" > /tmp/entrypoint.sh
+RUN chmod +x /tmp/entrypoint.sh
+RUN dos2unix /tmp/entrypoint.sh
+
+ENTRYPOINT /tmp/entrypoint.sh
+
+# docker rmi san_tomcat | docker build -t san_tomcat -f Dockerfile-san-tomcat --build-arg PBK_TO_BUILD=tomcat .
+# docker run -p 8087:8080 -it san_tomcat
+```
+
+---
+
+## `san_httpd`
+
+### Version `v0.1.2`
+
+- Prend en argument `--build-arg SSL` pour activer ou désactiver le SSL.
+- Nécessite des fichiers SSL (certificats, clés).
+
+```Dockerfile
+ARG SSL
+ARG PBK_TO_BUILD
+FROM $PBK_TO_BUILD:latest AS base
+USER root
+
+# Configuration SSL
+FROM base AS ssl-on
+ARG PATH_TO_SSL
+ARG CRT_FILE_NAME
+ARG KEY_FILE_NAME
+ENV PATH_TO_SSL=$PATH_TO_SSL
+ENV CRT_FILE_NAME=$CRT_FILE_NAME
+ENV KEY_FILE_NAME=$KEY_FILE_NAME
+COPY ./ssl/$CRT_FILE_NAME $PATH_TO_SSL/$CRT_FILE_NAME
+COPY ./ssl/$KEY_FILE_NAME $PATH_TO_SSL/$KEY_FILE_NAME
+
+FROM base AS ssl-off
+FROM ssl-${SSL} AS final
+
+RUN apt-get update && apt-get install -y ansible dos2unix && apt-get clean
+
+ARG PBK_TO_BUILD
+ENV PBK_TO_BUILD=$PBK_TO_BUILD
+
+RUN mkdir -p /ansible/$PBK_TO_BUILD
+COPY ./ansible/roles/$PBK_TO_BUILD /ansible/$PBK_TO_BUILD
+COPY ./ansible/playbooks/main.yml /ansible/main.yml
+RUN chmod +x /ansible/$PBK_TO_BUILD
+
+WORKDIR /ansible
+RUN ansible-playbook main.yml -vv
+
+WORKDIR /
+RUN rm -rf /ansible
+
+# Lancement
+ARG ENTRYPOINT
+RUN echo "#!/bin/bash\n$ENTRYPOINT" > /tmp/entrypoint.sh
+RUN chmod +x /tmp/entrypoint.sh
+RUN dos2unix /tmp/entrypoint.sh
+
+ENTRYPOINT /tmp/entrypoint.sh
+CMD [ "rm /tmp/entrypoint.sh" ]
+
+# SSL ON
+# docker build -t san_httpd -f Dockerfile --build-arg SSL=on --build-arg PATH_TO_SSL="/etc/ssl" .
+# docker run -p 443:443 san_httpd
+
+# SSL OFF
+# docker build -t san_httpd -f Dockerfile --build-arg SSL=off .
+# docker run -p 80:80 san_httpd
+```
+
+---
+
+### Note
+
+Pour plus d'informations, voir les sections spécifiques de chaque service ou contacter l'équipe DevOps.

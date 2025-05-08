@@ -1,0 +1,104 @@
+# Roles
+
+Cette section décrit l'utilisation des rôles Ansible dans le projet Nilcloud.
+
+---
+
+## Structure des rôles
+
+Chaque rôle est structuré selon les meilleures pratiques Ansible :
+
+```plaintext
+roles/
+├── nom_du_role/
+│   ├── tasks/
+│   │   ├── main.yml
+│   ├── files/
+│   ├── templates/
+│   ├── vars/
+│   │   ├── main.yml
+│   ├── defaults/
+│   │   ├── main.yml
+│   ├── meta/
+│   │   ├── main.yml
+```
+
+### Description des dossiers :
+
+- **tasks/** : Contient le fichier `main.yml` décrivant les étapes du rôle.
+- **files/** : Contient les fichiers nécessaires à la configuration.
+- **templates/** : Contient les fichiers Jinja2 pour la génération dynamique.
+- **vars/** : Déclare les variables spécifiques au rôle.
+- **defaults/** : Définit les valeurs par défaut des variables.
+- **meta/** : Contient des informations sur les dépendances entre rôles.
+
+---
+
+## Exemple de rôle : Configuration de Tomcat
+
+Un rôle peut être utilisé pour configurer une application spécifique comme Tomcat. Voici un exemple :
+
+### Fichier `tasks/main.yml`
+
+```yaml
+---
+- name: "Installer Tomcat"
+  apt:
+    name: tomcat9
+    state: present
+
+- name: "Configurer le fichier server.xml"
+  template:
+    src: server.xml.j2
+    dest: /etc/tomcat9/server.xml
+
+- name: "Redémarrer Tomcat"
+  service:
+    name: tomcat9
+    state: restarted
+```
+
+### Fichier `templates/server.xml.j2`
+
+```xml
+<Connector port="{{ tomcat_port }}" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="8443" />
+```
+
+---
+
+## Utilisation des rôles dans les playbooks
+
+Les rôles sont inclus dans les playbooks Ansible comme suit :
+
+```yaml
+---
+- name: "Déploiement avec Ansible"
+  hosts: all
+  roles:
+    - nom_du_role
+```
+
+### Variables pour les rôles
+
+Les variables peuvent être passées aux rôles depuis le playbook :
+
+```yaml
+---
+- name: "Configurer Tomcat"
+  hosts: app_servers
+  vars:
+    tomcat_port: 8080
+  roles:
+    - tomcat
+```
+
+---
+
+## Objectif
+
+- Standardiser la configuration et la gestion des applications.
+- Réduire la duplication des tâches grâce à une structure modulaire.
+
+Pour plus d'exemples, consultez la documentation officielle Ansible sur les [rôles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html).
