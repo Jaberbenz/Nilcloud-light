@@ -36,7 +36,7 @@ Nilcloud est une solution moderne de déploiement qui permet de créer et gérer
 1. Clonez le repository
 
 ```bash
-git clone https://github.com/your-username/nilcloud.git
+git clone https://github.com/Jaberbenz/Nilcloud-light.git
 cd nilcloud
 ```
 
