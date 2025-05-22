@@ -18,7 +18,9 @@ Nilcloud est une solution moderne de déploiement qui permet de créer et gérer
 - **Framework**: Next.js 13+ (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **State Management**: Redux
+- **State Management**:
+  - Redux Toolkit pour l'état global et RTK Query pour les API
+  - Zustand pour les stores spécifiques (authentification, sessions)
 - **Animation**: Framer Motion
 - **Authentication**: Custom Auth Service
 - **Payment**: Stripe Integration
@@ -36,8 +38,8 @@ Nilcloud est une solution moderne de déploiement qui permet de créer et gérer
 1. Clonez le repository
 
 ```bash
-git clone https://github.com/your-username/nilcloud.git
-cd nilcloud
+git clone https://github.com/Jaberbenz/Nilcloud-light.git
+cd Nilcloud-light
 ```
 
 2. Installez les dépendances
@@ -140,16 +142,6 @@ npm run build
 yarn build
 ```
 
-## Deployment
-
-### Vercel
-
-Le déploiement sur Vercel est recommandé :
-
-1. Connectez votre repository GitHub à Vercel
-2. Configurez les variables d'environnement dans le dashboard Vercel
-3. Déployez automatiquement à chaque push sur main
-
 ### Environment Variables
 
 Variables d'environnement requises :
@@ -158,41 +150,9 @@ Variables d'environnement requises :
 - `NEXT_PUBLIC_URL`
 - Autres clés API et configurations
 
-## Contributing
-
-1. Fork le projet
-2. Créez votre branche de feature (`git checkout -b feature/AmazingFeature`)
-3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrez une Pull Request
-
-## License
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
-## Support
-
-Pour toute question ou problème, veuillez ouvrir une issue dans le repository GitHub.
-
 ## Acknowledgments
 
 - [Next.js](https://nextjs.org)
 - [Tailwind CSS](https://tailwindcss.com)
 - [Framer Motion](https://www.framer.com/motion/)
 - [Stripe](https://stripe.com)
-
-# Nilcloud Frontend Technical Documentation
-
-## Architecture Overview
-
-### Tech Stack
-
-- **Framework**: Next.js 13+ (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Redux
-- **Animation**: Framer Motion
-- **Authentication**: Custom Auth Service
-- **Payment Integration**: Stripe
-
-### Project Structure
